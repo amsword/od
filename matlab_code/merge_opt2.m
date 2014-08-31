@@ -1,0 +1,26 @@
+function [D_dense, aux, centers, errors] = ...
+    merge_opt2(...
+        base_binary_code, ...
+        num_partition, ...
+        Xbase)
+fprintf('compute E\n');
+E = mexComputeE(...
+    base_binary_code, num_partition);
+
+%
+fprintf('compute G\n');
+[G, centers, errors] = mexComputeG(...
+    base_binary_code, ...
+    Xbase, ...
+    E);
+%
+matE = ConstructMat(E);
+matG = ConstructMat(G);
+
+fprintf('compute inv(E)');
+inv_matE = pinv(matE);
+
+D_dense =  inv_matE * matG * inv_matE;
+
+aux = bsxfun(@times, inv_matE, diag(matE)');
+aux = aux';
